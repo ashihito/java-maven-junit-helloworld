@@ -28,14 +28,13 @@ pipeline {
             }
         }
         stage ('Analysis') {
-            def mvnHome = tool 'mvn-default'
  
             sh "${mvnHome}/bin/mvn -batch-mode -V -U -e checkstyle:checkstyle spotbugs:spotbugs"
  
-            def checkstyle = scanForIssues tool: [$class: 'CheckStyle'], pattern: '**/target/checkstyle-result.xml'
+            def checkstyle = scanForIssues tool: [$class: 'CheckStyle'], pattern: 'checkstyle-result.xml'
             publishIssues issues:[checkstyle]
 
-            def spotbugs = scanForIssues tool: [$class: 'SpotBugs'], pattern: '**/target/spotbugsXml.xml'
+            def spotbugs = scanForIssues tool: [$class: 'SpotBugs'], pattern: 'spotbugsXml.xml'
             publishIssues issues:[spotbugs]
         }
     }
