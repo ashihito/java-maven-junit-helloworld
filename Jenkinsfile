@@ -15,7 +15,7 @@ pipeline {
         label env.docker_image_name
         }
     }
-    stage {
+    stages {
         stage('maven execution') {
             steps {
                 script {
@@ -27,7 +27,7 @@ pipeline {
                 }
             }
         }
-        stages ('Analysis') {
+        stage ('Analysis') {
  
             def checkstyle = scanForIssues tool: [$class: 'CheckStyle'], pattern: 'checkstyle-result.xml'
             publishIssues issues:[checkstyle]
