@@ -29,10 +29,10 @@ pipeline {
         }
         stage ('Analysis') {
  
-            def checkstyle = scanForIssues tool: [$class: 'CheckStyle'], pattern: 'checkstyle-result.xml'
+            def checkstyle = scanForIssues tool: [$class: 'CheckStyle'], pattern: '**/target/checkstyle-result.xml'
             publishIssues issues:[checkstyle]
 
-            def spotbugs = scanForIssues tool: [$class: 'SpotBugs'], pattern: 'spotbugsXml.xml'
+            def spotbugs = scanForIssues tool: [$class: 'SpotBugs'], pattern: '**/target/spotbugsXml.xml'
             publishIssues issues:[spotbugs]
         }
     }
