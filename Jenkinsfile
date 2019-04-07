@@ -15,7 +15,7 @@ pipeline {
         label env.docker_image_name
         }
     }
-    stages {
+    stage {
         stage('maven execution') {
             steps {
                 script {
