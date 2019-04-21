@@ -28,12 +28,50 @@ pipeline {
             }
         }
         stage ('Analysis') {
- 
-            def checkstyle = scanForIssues tool: [$class: 'CheckStyle'], pattern: '**/target/checkstyle-result.xml'
-            publishIssues issues:[checkstyle]
+            steps {
+                // 並列処理の場合はparallelメソッドを使う
+                parallel(
+                    '静的コード解析' : {
+                        sh 'mvn test'
 
-            def spotbugs = scanForIssues tool: [$class: 'SpotBugs'], pattern: '**/target/spotbugsXml.xml'
-            publishIssues issues:[spotbugs]
+                        // dirメソッドでカレントディレクトリを指定できる
+                        dir(reportDir) {
+                            step([
+                                $class: 'CheckStylePublisher',
+                                pattern: "checkstyle/*.xml"
+                            ])
+                            step([
+                                $class: 'FindBugsPublisher',
+                                pattern: "findbugs/*.xml"
+                            ])
+                            step([
+                                $class: 'PmdPublisher',
+                                pattern: "pmd/*.xml"
+                            ])
+                            step([
+                                $class: 'DryPublisher',
+                                pattern: "cpd/*.xml"
+                            ])
+
+                            archiveArtifacts "checkstyle/*.xml"
+                            archiveArtifacts "findbugs/*.xml"
+                            archiveArtifacts "pmd/*.xml"
+                            archiveArtifacts "cpd/*.xml"
+                        }
+                    },
+                    'ステップカウント': {
+                        // レポート作成
+                        // outputFileとoutputFormatを指定するとエクセルファイルも作成してくれる
+                        stepcounter outputFile: 'stepcount.xls', outputFormat: 'excel', settings: [
+                            [key:'Java', filePattern: "${javaDir}/**/*.java"],
+                            [key:'SQL', filePattern: "${resourcesDir}/**/*.sql"],
+                            [key:'HTML', filePattern: "${resourcesDir}/**/*.html"],
+                            [key:'JS', filePattern: "${resourcesDir}/**/*.js"],
+                            [key:'CSS', filePattern: "${resourcesDir}/**/*.css"]
+                        ]
+                        // 一応エクセルファイルも成果物として保存する
+                        archiveArtifacts "stepcount.xls"
+                    }
         }
     }
 
