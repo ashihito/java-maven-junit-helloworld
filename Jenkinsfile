@@ -29,12 +29,10 @@ pipeline {
         }
         stage ('Analysis') {
             steps {
-                // •À—ñˆ—‚Ìê‡‚Íparallelƒƒ\ƒbƒh‚ğg‚¤
                 parallel(
-                    'Ã“IƒR[ƒh‰ğÍ' : {
+                    'test exec' : {
                         sh 'mvn test'
 
-                        // dirƒƒ\ƒbƒh‚ÅƒJƒŒƒ“ƒgƒfƒBƒŒƒNƒgƒŠ‚ğw’è‚Å‚«‚é
                         dir(reportDir) {
                             step([
                                 $class: 'CheckStylePublisher',
@@ -59,9 +57,9 @@ pipeline {
                             archiveArtifacts "cpd/*.xml"
                         }
                     },
-                    'ƒXƒeƒbƒvƒJƒEƒ“ƒg': {
-                        // ƒŒƒ|[ƒgì¬
-                        // outputFile‚ÆoutputFormat‚ğw’è‚·‚é‚ÆƒGƒNƒZƒ‹ƒtƒ@ƒCƒ‹‚àì¬‚µ‚Ä‚­‚ê‚é
+                    'ï¿½Xï¿½eï¿½bï¿½vï¿½Jï¿½Eï¿½ï¿½ï¿½g': {
+                        // ï¿½ï¿½ï¿½|ï¿½[ï¿½gï¿½ì¬
+                        // outputFileï¿½ï¿½outputFormatï¿½ï¿½ï¿½wï¿½è‚·ï¿½ï¿½ÆƒGï¿½Nï¿½Zï¿½ï¿½ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ì¬ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½
                         stepcounter outputFile: 'stepcount.xls', outputFormat: 'excel', settings: [
                             [key:'Java', filePattern: "${javaDir}/**/*.java"],
                             [key:'SQL', filePattern: "${resourcesDir}/**/*.sql"],
@@ -69,9 +67,10 @@ pipeline {
                             [key:'JS', filePattern: "${resourcesDir}/**/*.js"],
                             [key:'CSS', filePattern: "${resourcesDir}/**/*.css"]
                         ]
-                        // ˆê‰ƒGƒNƒZƒ‹ƒtƒ@ƒCƒ‹‚à¬‰Ê•¨‚Æ‚µ‚Ä•Û‘¶‚·‚é
+                        // ï¿½ê‰ï¿½Gï¿½Nï¿½Zï¿½ï¿½ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê•ï¿½ï¿½Æ‚ï¿½ï¿½Ä•Û‘ï¿½ï¿½ï¿½ï¿½ï¿½
                         archiveArtifacts "stepcount.xls"
                     }
+                )
         }
     }
 
