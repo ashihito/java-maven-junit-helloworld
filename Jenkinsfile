@@ -71,6 +71,7 @@ pipeline {
                         archiveArtifacts "stepcount.xls"
                     }
                 )
+            }
         }
     }
 
