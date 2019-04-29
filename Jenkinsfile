@@ -23,6 +23,7 @@ pipeline {
                         sh 'set HTTP_PROXY=$HTTP_PROXY'
                         sh 'set HTTPS_PROXY=$HTTP_PROXY'
                         sh 'mvn clean package site'
+                        step( [ $class: 'JacocoPublisher' ] )
                     }
                 }
             }
@@ -31,6 +32,9 @@ pipeline {
             steps {
                 sh 'mvn --batch-mode -V -U -e checkstyle:checkstyle pmd:pmd pmd:cpd findbugs:findbugs com.github.spotbugs:spotbugs-maven-plugin:3.1.3:spotbugs'
             }
+            stepcounter settings: [
+                [encoding: 'UTF-8', filePattern: 'src/main/java/com/example/javamavenjunithelloworld/*.java', filePatternExclude: '', key: 'Java'], 
+                [encoding: 'UTF-8', filePattern: 'src/test/java/com/example/javamavenjunithelloworld/*.java', filePatternExclude: '', key: 'TestCode']]
         }
     }
     post {
