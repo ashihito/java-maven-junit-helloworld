@@ -25,6 +25,11 @@ pipeline {
                         sh 'mvn clean package site'
                     }
                 }
+                step([
+                    $class: 'JacocoPublisher',
+                    execPattern: "${jacocoReportDir}/*.exec",
+                    exclusionPattern: '**/*Test.class'
+                ])
             }
         }
         stage('Analysis') {
