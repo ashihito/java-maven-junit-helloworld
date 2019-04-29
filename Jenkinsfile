@@ -4,6 +4,7 @@ pipeline {
     }
     environment {
         docker_image_name = "java8-maven3-junit5"
+        jacocoReportDir = 'build/jacoco' 
     }
     
     agent {
