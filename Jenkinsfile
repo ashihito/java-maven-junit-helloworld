@@ -4,14 +4,6 @@ pipeline {
     }
     environment {
         docker_image_name = "java8-maven3-junit5"
-        reportDir = 'build/reports'
-        javaDir = 'src/main/java'
-        resourcesDir = 'src/main/resources'
-        testReportDir = 'build/test-results/test'
-        jacocoReportDir = 'build/jacoco' 
-        javadocDir = 'build/docs/javadoc'
-        libsDir = 'build/libs'
-        appName = 'SampleApp'
     }
     
     agent {
@@ -37,46 +29,19 @@ pipeline {
         }
         stage ('Analysis') {
             steps {
-                parallel(
-                    'test exec' : {
-                        sh 'mvn test'
-
-                        dir(reportDir) {
-                            step([
-                                $class: 'CheckStylePublisher',
-                                pattern: "checkstyle/*.xml"
-                            ])
-                            step([
-                                $class: 'FindBugsPublisher',
-                                pattern: "findbugs/*.xml"
-                            ])
-                            step([
-                                $class: 'PmdPublisher',
-                                pattern: "pmd/*.xml"
-                            ])
-                            step([
-                                $class: 'DryPublisher',
-                                pattern: "cpd/*.xml"
-                            ])
-
-                            archiveArtifacts "checkstyle/*.xml"
-                            archiveArtifacts "findbugs/*.xml"
-                            archiveArtifacts "pmd/*.xml"
-                            archiveArtifacts "cpd/*.xml"
-                        }
-                    },
-                    'file': {
-                        stepcounter outputFile: 'stepcount.xls', outputFormat: 'excel', settings: [
-                            [key:'Java', filePattern: "${javaDir}/**/*.java"],
-                            [key:'SQL', filePattern: "${resourcesDir}/**/*.sql"],
-                            [key:'HTML', filePattern: "${resourcesDir}/**/*.html"],
-                            [key:'JS', filePattern: "${resourcesDir}/**/*.js"],
-                            [key:'CSS', filePattern: "${resourcesDir}/**/*.css"]
-                        ]
-                        archiveArtifacts "stepcount.xls"
-                    }
-                )
+                sh '${M2_HOME}/bin/mvn --batch-mode -V -U -e checkstyle:checkstyle pmd:pmd pmd:cpd findbugs:findbugs spotbugs:spotbugs'
             }
+        }
+    }
+    post {
+        always {
+            junit testResults: '**/target/surefire-reports/TEST-*.xml'
+
+            recordIssues enabledForFailure: true, tools: [mavenConsole(), java(), javaDoc()]
+            recordIssues enabledForFailure: true, tool: checkStyle()
+            recordIssues enabledForFailure: true, tool: spotBugs()
+            recordIssues enabledForFailure: true, tool: cpd(pattern: '**/target/cpd.xml')
+            recordIssues enabledForFailure: true, tool: pmdParser(pattern: '**/target/pmd.xml')
         }
     }
 
