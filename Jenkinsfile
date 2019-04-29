@@ -4,6 +4,14 @@ pipeline {
     }
     environment {
         docker_image_name = "java8-maven3-junit5"
+        reportDir = 'build/reports'
+        javaDir = 'src/main/java'
+        resourcesDir = 'src/main/resources'
+        testReportDir = 'build/test-results/test'
+        jacocoReportDir = 'build/jacoco' 
+        javadocDir = 'build/docs/javadoc'
+        libsDir = 'build/libs'
+        appName = 'SampleApp'
     }
     
     agent {
@@ -57,9 +65,7 @@ pipeline {
                             archiveArtifacts "cpd/*.xml"
                         }
                     },
-                    '�X�e�b�v�J�E���g': {
-                        // ���|�[�g�쐬
-                        // outputFile��outputFormat���w�肷��ƃG�N�Z���t�@�C�����쐬���Ă����
+                    'file': {
                         stepcounter outputFile: 'stepcount.xls', outputFormat: 'excel', settings: [
                             [key:'Java', filePattern: "${javaDir}/**/*.java"],
                             [key:'SQL', filePattern: "${resourcesDir}/**/*.sql"],
@@ -67,7 +73,6 @@ pipeline {
                             [key:'JS', filePattern: "${resourcesDir}/**/*.js"],
                             [key:'CSS', filePattern: "${resourcesDir}/**/*.css"]
                         ]
-                        // �ꉞ�G�N�Z���t�@�C�������ʕ��Ƃ��ĕۑ�����
                         archiveArtifacts "stepcount.xls"
                     }
                 )
